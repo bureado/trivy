@@ -56,6 +56,13 @@ func (a alpinePkgAnalyzer) parseApkInfo(scanner *bufio.Scanner) ([]types.Package
 		// check package if paragraph end
 		if len(line) < 2 {
 			if !pkg.Empty() {
+				if (len(pkg.SrcName) == 0 && len(pkg.Name) != 0) {
+					// We've encountered a binary package without source package information, so we'll adopt the binary's metadata
+					pkg.SrcName = pkg.Name
+					if(len(pkg.Version) != 0) {
+							pkg.SrcVersion = pkg.Version
+					}
+				}
 				pkgs = append(pkgs, pkg)
 			}
 			pkg = types.Package{}
