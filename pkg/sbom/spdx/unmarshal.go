@@ -168,6 +168,12 @@ func parsePkg(spdxPkg spdx.Package2_2) (*ftypes.Package, error) {
 
 	if strings.HasPrefix(spdxPkg.PackageSourceInfo, SourcePackagePrefix) {
 		srcPkgName := strings.TrimPrefix(spdxPkg.PackageSourceInfo, fmt.Sprintf("%s: ", SourcePackagePrefix))
+		if (len(srcPkgName) < 2 && len(pkg.Name) != 0) {
+			// The magic string is empty so we'll recreate it with binary package information
+			if(len(pkg.Version) != 0) {
+				srcPkgName = fmt.Sprintf("%s %s", pkg.Name, pkg.Version)
+			}
+		}
 		pkg.SrcEpoch, pkg.SrcName, pkg.SrcVersion, pkg.SrcRelease, err = parseSourceInfo(pkgType, srcPkgName)
 		if err != nil {
 			return nil, xerrors.Errorf("failed to parse source info: %w", err)
