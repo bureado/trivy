@@ -103,6 +103,13 @@ func (s *Scanner) Detect(osVer string, repo *ftypes.Repository, pkgs []ftypes.Pa
 
 	var vulns []types.DetectedVulnerability
 	for _, pkg := range pkgs {
+		if (len(pkg.SrcName) == 0 && len(pkg.Name) != 0) {
+			// We've encountered a binary package without source package information, so we'll adopt the binary's metadata
+			pkg.SrcName = pkg.Name
+			if(len(pkg.Version) != 0) {
+				pkg.SrcVersion = pkg.Version
+			}
+		}
 		advisories, err := s.vs.Get(stream, pkg.SrcName)
 		if err != nil {
 			return nil, xerrors.Errorf("failed to get alpine advisories: %w", err)
